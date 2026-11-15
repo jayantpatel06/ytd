@@ -24,10 +24,8 @@ def convert_png_to_ico():
     try:
         from PIL import Image
         img = Image.open(ICON_PNG).convert("RGBA")
-        sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
-        resized = [img.resize(s, Image.LANCZOS) for s in sizes]
-        resized[0].save(ICON_ICO, format="ICO", sizes=sizes,
-                        append_images=resized[1:])
+        sizes = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
+        img.save(ICON_ICO, format="ICO", sizes=sizes)
         print(f"Icon converted: {ICON_ICO}")
         return True
     except ImportError:
@@ -40,8 +38,8 @@ def convert_png_to_ico():
 
 
 def build():
-    # Convert PNG → ICO if needed
-    if not os.path.exists(ICON_ICO) and os.path.exists(ICON_PNG):
+    # Convert PNG → ICO if missing or updated
+    if os.path.exists(ICON_PNG) and (not os.path.exists(ICON_ICO) or os.path.getmtime(ICON_PNG) > os.path.getmtime(ICON_ICO)):
         convert_png_to_ico()
 
     has_icon = os.path.exists(ICON_ICO)
@@ -59,6 +57,7 @@ def build():
         "--hidden-import", "ytd.shortcut",
         "--hidden-import", "ytd.ffmpeg_utils",
         "--hidden-import", "ytd.updater",
+        "--hidden-import", "customtkinter",
         "--hidden-import", "win32com",
         "--hidden-import", "win32com.client",
         "--hidden-import", "win32com.shell",

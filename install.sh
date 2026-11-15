@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # install.sh — Web & local installer for YouTube Downloader on Linux
 # Usage:
-#   curl -sSL https://raw.githubusercontent.com/jayantpatel06/ytd-downloader/main/install.sh | bash
+#   curl -sSL https://raw.githubusercontent.com/jayantpatel06/ytd/main/install.sh | bash
 
 set -e
 
-REPO="jayantpatel06/ytd-downloader"
+REPO="jayantpatel06/ytd"
 INSTALL_DIR="$HOME/.local/share/ytd"
 BIN_DIR="$HOME/.local/bin"
 DESKTOP_DIR="$HOME/.local/share/applications"
@@ -15,12 +15,143 @@ echo "============================================="
 echo "   Installing YouTube Downloader for Linux   "
 echo "============================================="
 
-# 1. Ensure Python 3 is installed
-if ! command -v python3 &>/dev/null; then
-    echo "Error: python3 is required but not installed." >&2
-    echo "Install it via your package manager (e.g. sudo apt install python3)" >&2
-    exit 1
-fi
+# Ensure system dependencies (Python 3, venv, Tkinter, pip, git)
+ensure_system_dependencies() {
+    local missing=()
+    local pkg_manager=""
+
+    # 1. Detect Linux package manager
+    if command -v apt-get &>/dev/null; then
+        pkg_manager="apt"
+    elif command -v dnf &>/dev/null; then
+        pkg_manager="dnf"
+    elif command -v pacman &>/dev/null; then
+        pkg_manager="pacman"
+    elif command -v zypper &>/dev/null; then
+        pkg_manager="zypper"
+    fi
+
+    # 2. Check for python3
+    if ! command -v python3 &>/dev/null; then
+        missing+=("python3")
+    else
+        # 3. Check for python3-venv (venv module)
+        if ! python3 -c "import venv" &>/dev/null; then
+            if [ "$pkg_manager" = "apt" ] || [ "$pkg_manager" = "zypper" ]; then
+                missing+=("python3-venv")
+            fi
+        fi
+
+        # 4. Check for python3-tk (tkinter module for GUI)
+        if ! python3 -c "import tkinter" &>/dev/null; then
+            if [ "$pkg_manager" = "apt" ]; then
+                missing+=("python3-tk")
+            elif [ "$pkg_manager" = "dnf" ]; then
+                missing+=("python3-tkinter")
+            elif [ "$pkg_manager" = "pacman" ]; then
+                missing+=("tk")
+            elif [ "$pkg_manager" = "zypper" ]; then
+                missing+=("python3-tk")
+            fi
+        fi
+
+        # 5. Check for pip
+        if ! python3 -m pip --version &>/dev/null; then
+            if [ "$pkg_manager" = "apt" ]; then
+                missing+=("python3-pip")
+            elif [ "$pkg_manager" = "dnf" ]; then
+                missing+=("python3-pip")
+            elif [ "$pkg_manager" = "pacman" ]; then
+                missing+=("python-pip")
+            elif [ "$pkg_manager" = "zypper" ]; then
+                missing+=("python3-pip")
+            fi
+        fi
+    fi
+
+    # 6. Check for git (if installing from remote repo)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
+    if [ ! -f "$SCRIPT_DIR/pyproject.toml" ] && ! command -v git &>/dev/null; then
+        missing+=("git")
+    fi
+
+    # If all requirements are met, return immediately
+    if [ ${#missing[@]} -eq 0 ]; then
+        echo "- System prerequisites (Python 3, venv, Tkinter, pip): OK"
+        return 0
+    fi
+
+    echo ""
+    echo "=========================================================="
+    echo "  Notice: Missing required system packages:"
+    echo "  ${missing[*]}"
+    echo "=========================================================="
+
+    if [ -z "$pkg_manager" ]; then
+        echo "Error: Could not identify supported package manager (apt, dnf, pacman, zypper)." >&2
+        echo "Please install the missing dependencies manually: ${missing[*]}" >&2
+        exit 1
+    fi
+
+    local full_cmd=""
+    case "$pkg_manager" in
+        apt)
+            full_cmd="sudo apt-get update && sudo apt-get install -y ${missing[*]}"
+            ;;
+        dnf)
+            full_cmd="sudo dnf install -y ${missing[*]}"
+            ;;
+        pacman)
+            full_cmd="sudo pacman -Sy --noconfirm ${missing[*]}"
+            ;;
+        zypper)
+            full_cmd="sudo zypper install -y ${missing[*]}"
+            ;;
+    esac
+
+    echo "These packages are required to run YouTube Downloader and its GUI."
+    echo ""
+
+    # Prompt user for confirmation (supports interactive shell & curl | bash pipe)
+    local do_install=false
+    local prompt_msg="Would you like to install them automatically using sudo? [Y/n] "
+
+    if [ -t 0 ]; then
+        read -r -p "$prompt_msg" response
+    elif [ -r /dev/tty ]; then
+        read -r -p "$prompt_msg" response </dev/tty
+    else
+        response="n"
+    fi
+
+    case "$response" in
+        [yY][eE][sS]|[yY]|"")
+            do_install=true
+            ;;
+        *)
+            do_install=false
+            ;;
+    esac
+
+    if [ "$do_install" = true ]; then
+        echo "Executing: $full_cmd"
+        if eval "$full_cmd"; then
+            echo "- System packages installed successfully."
+        else
+            echo "Error: Failed to install system packages." >&2
+            echo "Please run the command manually: $full_cmd" >&2
+            exit 1
+        fi
+    else
+        echo ""
+        echo "Installation cancelled."
+        echo "Please install the required packages manually and re-run:"
+        echo "    $full_cmd"
+        exit 1
+    fi
+}
+
+ensure_system_dependencies
 
 # 2. Check for FFmpeg (auto-downloaded on first run if missing from system)
 if command -v ffmpeg &>/dev/null || [ -f "$INSTALL_DIR/bin/ffmpeg" ]; then
@@ -43,11 +174,16 @@ if ! python3 -m venv "$INSTALL_DIR/venv" 2>/dev/null; then
     exit 1
 fi
 
-# 5. Install ytd-downloader into the venv
+# 5. Install ytd into the venv
 VENV_PIP="$INSTALL_DIR/venv/bin/pip"
 VENV_PYTHON="$INSTALL_DIR/venv/bin/python"
 
-echo "- Installing ytd-downloader..."
+# Ensure pip is present inside the virtual environment
+if [ ! -f "$VENV_PIP" ]; then
+    "$VENV_PYTHON" -m ensurepip --upgrade 2>/dev/null || true
+fi
+
+echo "- Installing ytd and dependencies..."
 "$VENV_PIP" install --upgrade pip setuptools wheel --quiet
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
@@ -57,7 +193,12 @@ if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/pyproject.toml" ]; then
         cp "$SCRIPT_DIR/assets/ytd_icon.png" "$ICON_PATH"
     fi
 else
-    "$VENV_PIP" install "git+https://github.com/$REPO.git" --quiet
+    # Install from remote repository (uses git if available, falls back to direct zip)
+    if command -v git &>/dev/null; then
+        "$VENV_PIP" install "git+https://github.com/$REPO.git" --quiet
+    else
+        "$VENV_PIP" install "https://github.com/$REPO/archive/refs/heads/main.zip" --quiet
+    fi
     ICON_URL="https://raw.githubusercontent.com/$REPO/main/assets/ytd_icon.png"
     if command -v curl &>/dev/null; then
         curl -sSL "$ICON_URL" -o "$ICON_PATH" 2>/dev/null || true

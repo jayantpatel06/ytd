@@ -70,7 +70,7 @@ def download_ffmpeg_if_missing(status_callback=None) -> str | None:
     target_dir = get_appdata_ffmpeg_dir()
     bin_name = get_ffmpeg_bin_name()
     target_bin = os.path.join(target_dir, bin_name)
-    headers = {"User-Agent": "Mozilla/5.0 ytd-downloader"}
+    headers = {"User-Agent": "Mozilla/5.0 ytd"}
 
     # 1. Windows (x64)
     if sys.platform == "win32":

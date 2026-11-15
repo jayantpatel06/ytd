@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ytd-downloader"
-version = "1.0.5"
+name = "ytd"
+version = "1.0.6"
 description = "A simple YouTube / multi-site video downloader with both a GUI and a CLI, powered by yt-dlp."
 readme = "README.md"
 license = { text = "MIT" }
@@ -19,6 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "yt-dlp>=2024.1.1",
+    "customtkinter>=5.2.0",
 ]
 
 # Windows-only optional dep for desktop shortcut creation
@@ -28,9 +29,9 @@ windows = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jayantpatel06/ytd-downloader"
-"Bug Reports" = "https://github.com/jayantpatel06/ytd-downloader/issues"
-Source = "https://github.com/jayantpatel06/ytd-downloader"
+Homepage = "https://github.com/jayantpatel06/ytd"
+"Bug Reports" = "https://github.com/jayantpatel06/ytd/issues"
+Source = "https://github.com/jayantpatel06/ytd"
 
 [project.scripts]
 ytd = "ytd.cli:main"

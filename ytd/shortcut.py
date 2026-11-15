@@ -36,10 +36,6 @@ def create_desktop_shortcut(icon_path: str = "") -> bool:
         return False  # Only Windows
 
     try:
-        import winreg  # noqa: F401 — confirm we're on Windows
-        from win32com.shell import shell  # noqa: F401
-
-        import pythoncom
         from win32com.client import Dispatch
 
         desktop = get_desktop_path()

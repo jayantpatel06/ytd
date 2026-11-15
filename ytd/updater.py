@@ -4,15 +4,13 @@ ytd/updater.py — In-app self-updater: downloads new binary and replaces in-pla
 
 import json
 import os
-import shutil
 import subprocess
 import sys
-import threading
 import urllib.request
 from typing import Callable, Tuple
 
-REPO_API_URL = "https://api.github.com/repos/jayantpatel06/ytd-downloader/releases/latest"
-DEFAULT_DOWNLOAD_URL = "https://github.com/jayantpatel06/ytd-downloader/releases/latest/download/ytd.exe"
+REPO_API_URL = "https://api.github.com/repos/jayantpatel06/ytd/releases/latest"
+DEFAULT_DOWNLOAD_URL = "https://github.com/jayantpatel06/ytd/releases/latest/download/ytd.exe"
 
 
 def parse_version(v_str: str) -> Tuple[int, ...]:

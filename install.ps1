@@ -1,6 +1,6 @@
-﻿# install.ps1 — Web installer for YouTube Downloader
+# install.ps1 — Web & local installer for YouTube Downloader
 # Usage:
-#   irm https://raw.githubusercontent.com/jayantpatel06/ytd-downloader/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/jayantpatel06/ytd/main/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
@@ -8,7 +8,7 @@ try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
 } catch {}
 
-$repo = "jayantpatel06/ytd-downloader"
+$repo = "jayantpatel06/ytd"
 $installDir = "$env:LOCALAPPDATA\Programs\YTD"
 $exePath = "$installDir\ytd.exe"
 $iconPath = "$installDir\ytd_icon.ico"
@@ -19,6 +19,7 @@ Write-Host "Installing YouTube Downloader..."
 
 # 1. Ensure install folder exists and running process is stopped
 Get-Process ytd -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 500
 
 if (-not (Test-Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
