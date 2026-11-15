@@ -82,6 +82,8 @@ def get_default_download_dir() -> str:
 
 
 def main():
+    _attach_console()
+
     parser = argparse.ArgumentParser(
         prog="ytd",
         description="YouTube and multi-site video downloader powered by yt-dlp.",
@@ -113,9 +115,6 @@ def main():
         from ytd.gui import run_gui
         run_gui()
         return
-
-    # CLI mode: attach console output for Windows GUI subsystem
-    _attach_console()
 
     url = args.url.strip().strip('"\'<>')
     if not (url.startswith("http://") or url.startswith("https://")):

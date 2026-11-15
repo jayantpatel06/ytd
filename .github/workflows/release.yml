@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yt-dlp pyinstaller pillow pywin32
+          pip install yt-dlp customtkinter pyinstaller pillow pywin32
           choco install innosetup -y
 
       - name: Convert PNG icon to ICO
@@ -73,7 +73,8 @@ jobs:
             --hidden-import ytd.shortcut `
             --hidden-import ytd.ffmpeg_utils `
             --hidden-import ytd.updater `
-            --hidden-import customtkinter `
+            --collect-all customtkinter `
+            --hidden-import darkdetect `
             --hidden-import win32com `
             --hidden-import win32com.client `
             --hidden-import win32com.shell `

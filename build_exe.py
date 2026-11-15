@@ -2,7 +2,7 @@
 build_exe.py — Build a standalone Windows .exe with PyInstaller.
 
 Requirements:
-    pip install pyinstaller pywin32 pillow
+    pip install pyinstaller pywin32 pillow customtkinter
 
 Usage:
     python build_exe.py
@@ -57,7 +57,8 @@ def build():
         "--hidden-import", "ytd.shortcut",
         "--hidden-import", "ytd.ffmpeg_utils",
         "--hidden-import", "ytd.updater",
-        "--hidden-import", "customtkinter",
+        "--collect-all", "customtkinter",
+        "--hidden-import", "darkdetect",
         "--hidden-import", "win32com",
         "--hidden-import", "win32com.client",
         "--hidden-import", "win32com.shell",
