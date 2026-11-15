@@ -150,7 +150,7 @@ def main():
         merge_fmt = None
     else:
         if ffmpeg_bin:
-            fmt = f"bestvideo[height<={args.quality}]+bestaudio/best[height<={args.quality}]"
+            fmt = f"bestvideo[height<={args.quality}]+bestaudio/best[height<={args.quality}]/best"
             merge_fmt = "mp4"
         else:
             fmt = f"best[height<={args.quality}][ext=mp4]/best[height<={args.quality}]/best"

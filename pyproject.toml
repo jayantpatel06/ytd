@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ytd"
-version = "1.0.7"
+version = "1.0.8"
 description = "A simple YouTube / multi-site video downloader with both a GUI and a CLI, powered by yt-dlp."
 readme = "README.md"
 license = { text = "MIT" }
@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Multimedia :: Video",
 ]
 dependencies = [
-    "yt-dlp>=2024.1.1",
+    "yt-dlp>=2026.10.26",
     "customtkinter>=5.2.0",
 ]
 

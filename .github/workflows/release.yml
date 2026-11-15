@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yt-dlp customtkinter pyinstaller pillow pywin32
+          pip install --upgrade "yt-dlp>=2026.10.26" customtkinter pyinstaller pillow pywin32
           choco install innosetup -y
 
       - name: Convert PNG icon to ICO

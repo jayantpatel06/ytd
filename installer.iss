@@ -2,7 +2,7 @@
 ; Generates: ytd-setup.exe (traditional Windows Setup Wizard)
 
 #define MyAppName "YouTube Downloader"
-#define MyAppVersion "1.0.7"
+#define MyAppVersion "1.0.8"
 #define MyAppPublisher "YTD"
 #define MyAppURL "https://github.com/jayantpatel06/ytd"
 #define MyAppExeName "ytd.exe"

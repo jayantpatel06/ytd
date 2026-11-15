@@ -308,7 +308,7 @@ def run_gui():
             merge_fmt = None
         else:
             if ffmpeg_bin:
-                fmt = f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]"
+                fmt = f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]/best"
                 merge_fmt = "mp4"
             else:
                 # If FFmpeg is unavailable, fall back to pre-merged streams to prevent failure
